@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kaka-flores-e-cestas.vercel.app/sitemap.xml

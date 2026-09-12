@@ -25,6 +25,7 @@ import {
 const WHATSAPP = 'https://wa.me/5561982060828';
 const INSTAGRAM = 'https://www.instagram.com/kakalacerdaflores/';
 const LOCATION = 'https://maps.google.com/maps/place//data=!4m2!3m1!1s0x935a33cf71db6e23:0x191889aeb09266b1?entry=s&sa=X&ved=1t%3A8290&hl=pt-br&ictx=111';
+const SITE_URL = 'https://kaka-flores-e-cestas.vercel.app';
 
 const products = [
   {
@@ -202,6 +203,33 @@ const products = [
 
 const catalogGroups = ['Todos', 'Café da manhã', 'Café da tarde', 'Flores', 'Datas comemorativas', 'Pronta entrega'];
 
+function productPriceNumber(product) {
+  return Number(product.price.replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
+}
+
+const catalogJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: products.map((product, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    item: {
+      '@type': 'Product',
+      name: product.name,
+      description: product.summary,
+      category: product.category,
+      image: `${SITE_URL}${product.image}`,
+      offers: {
+        '@type': 'Offer',
+        price: productPriceNumber(product).toFixed(2),
+        priceCurrency: 'BRL',
+        availability: 'https://schema.org/InStock',
+        url: SITE_URL,
+      },
+    },
+  })),
+};
+
 const steps = [
   ['01', 'Escolha no catálogo', 'Conheça as opções, os valores e os detalhes de cada composição.'],
   ['02', 'Fale pelo WhatsApp', 'Ao escolher, você chega ao atendimento com o nome do produto já preenchido.'],
@@ -220,6 +248,19 @@ const faqs = [
   ['Posso personalizar o presente?', 'Sim. Mensagem, estilo e composição podem ser alinhados no atendimento, respeitando a disponibilidade de flores e itens da semana.'],
   ['Os produtos estão sempre disponíveis?', 'As flores e alguns itens variam conforme a semana. Coleções sazonais e quantidades limitadas devem ser confirmadas pelo WhatsApp.'],
 ];
+
+function webpSrc(src) {
+  return src.replace(/\.jpe?g$/i, '.webp');
+}
+
+function Photo({ src, alt, ...props }) {
+  return (
+    <picture>
+      <source srcSet={webpSrc(src)} type="image/webp" />
+      <img src={src} alt={alt} {...props} />
+    </picture>
+  );
+}
 
 function whatsapp(message) {
   return `${WHATSAPP}?text=${encodeURIComponent(message)}`;
@@ -280,7 +321,7 @@ function Hero() {
   return (
     <main id="inicio">
       <section className="hero">
-        <img className="hero-background" src="/images/cesta-artesanal.jpg" alt="Cesta artesanal Kaká Lacerda" fetchPriority="high" />
+        <Photo className="hero-background" src="/images/cesta-artesanal.jpg" alt="Cesta artesanal Kaká Lacerda" fetchPriority="high" />
         <div className="hero-shade" />
         <div className="hero-copy">
           <span>FLORES, CESTAS E AFETO</span>
@@ -329,7 +370,7 @@ function ProductModal({ product, onClose }) {
     <div className="product-modal-backdrop" role="presentation" onMouseDown={onClose}>
       <article className="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title" onMouseDown={(event) => event.stopPropagation()}>
         <button className="modal-close" type="button" ref={closeButtonRef} onClick={onClose} aria-label="Fechar detalhes"><X size={20} /></button>
-        <div className="modal-image"><img src={product.image} alt={product.name} />{product.badge && <span>{product.badge}</span>}</div>
+        <div className="modal-image"><Photo src={product.image} alt={product.name} />{product.badge && <span>{product.badge}</span>}</div>
         <div className="modal-copy">
           <span className="product-category">{product.catalogGroup}</span>
           <h3 id="product-modal-title">{product.name}</h3>
@@ -353,6 +394,7 @@ function Catalog() {
   return (
     <>
       <section className="catalog section" id="catalogo">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogJsonLd) }} />
         <div className="catalog-top">
           <header className="store-heading"><span>CATÁLOGO KAKÁ</span><h2>{activeCategory === 'Todos' ? 'Nossos destaques' : activeCategory}</h2></header>
           <p>Escolha seu presente e finalize todos os detalhes diretamente com a Kaká pelo WhatsApp.</p>
@@ -372,7 +414,7 @@ function Catalog() {
           {visibleProducts.map((product) => (
             <article className="product-card" key={product.name}>
               <button className="product-image" type="button" onClick={() => setSelectedProduct(product)} aria-label={`Ver detalhes de ${product.name}`}>
-                <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
+                <Photo src={product.image} alt={product.name} loading="lazy" decoding="async" />
                 {product.badge && <span>{product.badge}</span>}
                 <i>Ver detalhes</i>
               </button>
@@ -411,7 +453,7 @@ function Services() {
 function Story() {
   return (
     <section className="story" id="sobre">
-      <img src="/images/flores-verdes.jpg" alt="Flores preparadas pela Kaká Lacerda" loading="lazy" decoding="async" />
+      <Photo src="/images/flores-verdes.jpg" alt="Flores preparadas pela Kaká Lacerda" loading="lazy" decoding="async" />
       <div className="story-shade" />
       <div className="story-copy">
         <span>NOSSA ESSÊNCIA</span>
@@ -455,7 +497,7 @@ function InstagramLife() {
   return (
     <section className="testimonials section">
       <header className="store-heading instagram-heading"><span>ACOMPANHE A KAKÁ NO INSTAGRAM</span><h2>Inspirações para presentear</h2><p>Flores, bastidores e tudo o que rolou na semana.</p><a className="instagram-profile-link" href={INSTAGRAM} target="_blank" rel="noreferrer" aria-label="Seguir a Kaká Lacerda no Instagram"><span className="instagram-icon"><InstagramGlyph /></span> Seguir @kakalacerdaflores</a></header>
-      <div className="social-grid">{moments.map(([image, title, text]) => <article className="social-card" key={title}><img src={image} alt="" loading="lazy" decoding="async" /><div><span>NO INSTAGRAM</span><h3>{title}</h3><p>{text}</p><a href={INSTAGRAM} target="_blank" rel="noreferrer"><InstagramGlyph /> Ver publicação</a></div></article>)}</div>
+      <div className="social-grid">{moments.map(([image, title, text]) => <article className="social-card" key={title}><Photo src={image} alt="" loading="lazy" decoding="async" /><div><span>NO INSTAGRAM</span><h3>{title}</h3><p>{text}</p><a href={INSTAGRAM} target="_blank" rel="noreferrer"><InstagramGlyph /> Ver publicação</a></div></article>)}</div>
     </section>
   );
 }
