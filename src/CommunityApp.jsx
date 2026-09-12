@@ -280,7 +280,7 @@ function Hero() {
   return (
     <main id="inicio">
       <section className="hero">
-        <img className="hero-background" src="/images/cesta-artesanal.jpg" alt="Cesta artesanal Kaká Lacerda" />
+        <img className="hero-background" src="/images/cesta-artesanal.jpg" alt="Cesta artesanal Kaká Lacerda" fetchPriority="high" />
         <div className="hero-shade" />
         <div className="hero-copy">
           <span>FLORES, CESTAS E AFETO</span>
@@ -300,6 +300,8 @@ function Hero() {
 
 function ProductModal({ product, onClose }) {
   const trackedProduct = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
 
   useEffect(() => {
     if (!product) {
@@ -310,12 +312,15 @@ function ProductModal({ product, onClose }) {
       trackedProduct.current = product.name;
       trackProductView(product);
     }
+    previouslyFocusedRef.current = document.activeElement;
+    closeButtonRef.current?.focus();
     const onKeyDown = (event) => event.key === 'Escape' && onClose();
     document.body.classList.add('modal-open');
     window.addEventListener('keydown', onKeyDown);
     return () => {
       document.body.classList.remove('modal-open');
       window.removeEventListener('keydown', onKeyDown);
+      previouslyFocusedRef.current?.focus?.();
     };
   }, [product, onClose]);
 
@@ -323,7 +328,7 @@ function ProductModal({ product, onClose }) {
   return (
     <div className="product-modal-backdrop" role="presentation" onMouseDown={onClose}>
       <article className="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title" onMouseDown={(event) => event.stopPropagation()}>
-        <button className="modal-close" type="button" onClick={onClose} aria-label="Fechar detalhes"><X size={20} /></button>
+        <button className="modal-close" type="button" ref={closeButtonRef} onClick={onClose} aria-label="Fechar detalhes"><X size={20} /></button>
         <div className="modal-image"><img src={product.image} alt={product.name} />{product.badge && <span>{product.badge}</span>}</div>
         <div className="modal-copy">
           <span className="product-category">{product.catalogGroup}</span>
@@ -367,7 +372,7 @@ function Catalog() {
           {visibleProducts.map((product) => (
             <article className="product-card" key={product.name}>
               <button className="product-image" type="button" onClick={() => setSelectedProduct(product)} aria-label={`Ver detalhes de ${product.name}`}>
-                <img src={product.image} alt={product.name} />
+                <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
                 {product.badge && <span>{product.badge}</span>}
                 <i>Ver detalhes</i>
               </button>
@@ -406,7 +411,7 @@ function Services() {
 function Story() {
   return (
     <section className="story" id="sobre">
-      <img src="/images/flores-verdes.jpg" alt="Flores preparadas pela Kaká Lacerda" />
+      <img src="/images/flores-verdes.jpg" alt="Flores preparadas pela Kaká Lacerda" loading="lazy" decoding="async" />
       <div className="story-shade" />
       <div className="story-copy">
         <span>NOSSA ESSÊNCIA</span>
@@ -450,7 +455,7 @@ function InstagramLife() {
   return (
     <section className="testimonials section">
       <header className="store-heading instagram-heading"><span>ACOMPANHE A KAKÁ NO INSTAGRAM</span><h2>Inspirações para presentear</h2><p>Flores, bastidores e tudo o que rolou na semana.</p><a className="instagram-profile-link" href={INSTAGRAM} target="_blank" rel="noreferrer" aria-label="Seguir a Kaká Lacerda no Instagram"><span className="instagram-icon"><InstagramGlyph /></span> Seguir @kakalacerdaflores</a></header>
-      <div className="social-grid">{moments.map(([image, title, text]) => <article className="social-card" key={title}><img src={image} alt="" /><div><span>NO INSTAGRAM</span><h3>{title}</h3><p>{text}</p><a href={INSTAGRAM} target="_blank" rel="noreferrer"><InstagramGlyph /> Ver publicação</a></div></article>)}</div>
+      <div className="social-grid">{moments.map(([image, title, text]) => <article className="social-card" key={title}><img src={image} alt="" loading="lazy" decoding="async" /><div><span>NO INSTAGRAM</span><h3>{title}</h3><p>{text}</p><a href={INSTAGRAM} target="_blank" rel="noreferrer"><InstagramGlyph /> Ver publicação</a></div></article>)}</div>
     </section>
   );
 }
