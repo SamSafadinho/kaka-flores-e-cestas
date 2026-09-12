@@ -158,8 +158,8 @@ picture { display: contents; }
 .modal-copy > small { margin-top: 10px; color: #85887f; font-size: 10px; line-height: 1.5; text-align: center; }
 
 .story { height: 650px; position: relative; display: flex; align-items: center; overflow: hidden; color: #fff; }
-.story > img, .story-shade { height: 100%; position: absolute; inset: 0; }
-.story > img { object-fit: cover; object-position: center 45%; }
+.story > img, .story > picture > img, .story-shade { height: 100%; position: absolute; inset: 0; }
+.story > img, .story > picture > img { object-fit: cover; object-position: center 45%; }
 .story-shade { background: linear-gradient(90deg, rgba(36,43,30,.75), rgba(36,43,30,.28) 62%, transparent); }
 .story-copy { width: min(1280px, calc(100% - 80px)); position: relative; z-index: 2; margin: auto; }
 .story-copy > div { max-width: 560px; }
@@ -198,8 +198,8 @@ picture { display: contents; }
 .instagram-profile-link .instagram-icon { width: 30px; height: 30px; }
 .social-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .social-card { overflow: hidden; background: #f7f4ed; }
-.social-card > img { height: 340px; object-fit: cover; transition: transform .55s; }
-.social-card:hover > img { transform: scale(1.03); }
+.social-card > img, .social-card > picture > img { height: 340px; object-fit: cover; transition: transform .55s; }
+.social-card:hover > img, .social-card:hover > picture > img { transform: scale(1.03); }
 .social-card > div { padding: 25px; }
 .social-card span { color: var(--sage); font-size: 9px; font-weight: 600; letter-spacing: 1.5px; }
 .social-card h3 { margin: 8px 0; font: 500 25px 'Cormorant Garamond', Georgia, serif; }
@@ -330,7 +330,7 @@ picture { display: contents; }
   .modal-copy h3 { font-size: 39px; }
   .modal-close { position: fixed; top: calc(8vh + 12px); right: 12px; }
   .story { height: 610px; align-items: end; }
-  .story > img { object-position: 60% center; }
+  .story > img, .story > picture > img { object-position: 60% center; }
   .story-shade { background: linear-gradient(0deg, rgba(38,45,33,.85), rgba(38,45,33,.1) 77%); }
   .story-copy { width: calc(100% - 40px); padding-bottom: 45px; }
   .story-copy h2 { font-size: 61px; }
@@ -353,7 +353,7 @@ picture { display: contents; }
   .service-info-notes { align-items: flex-start; flex-direction: column; gap: 10px; }
   .testimonials { padding: 75px 0 80px; }
   .social-grid { grid-template-columns: 1fr; }
-  .social-card > img { height: 390px; }
+  .social-card > img, .social-card > picture > img { height: 390px; }
   .faq { grid-template-columns: 1fr; gap: 38px; padding: 70px 0 85px; }
   .faq-intro h2 { font-size: 48px; }
   .footer { padding: 75px 20px 17px; }
