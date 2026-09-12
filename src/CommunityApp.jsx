@@ -401,7 +401,7 @@ function Catalog() {
         </div>
         <div className="catalog-toolbar" aria-label="Filtrar catálogo">
           {catalogGroups.map((category) => (
-            <button className={activeCategory === category ? 'active' : ''} type="button" key={category} onClick={() => setActiveCategory(category)}>{category}</button>
+            <button className={activeCategory === category ? 'active' : ''} type="button" key={category} aria-pressed={activeCategory === category} onClick={() => setActiveCategory(category)}>{category}</button>
           ))}
         </div>
         {activeCategory === 'Pronta entrega' ? (
@@ -512,7 +512,7 @@ function FAQ() {
   );
 }
 
-function Footer({ onOpenPrivacy }) {
+function Footer({ onOpenCookiePreferences, onOpenPolicy }) {
   return (
     <footer className="footer">
       <div className="footer-cta"><span>VAMOS CRIAR ALGO ESPECIAL?</span><h2>Seu presente começa<br />com uma história.</h2><WhatsAppLink className="button button-light" href={whatsapp('Olá, Kaká! Quero criar um presente com história.')} source="chamada_final" target="_blank" rel="noreferrer">Falar com a Kaká <ArrowRight size={18} /></WhatsAppLink></div>
@@ -522,18 +522,25 @@ function Footer({ onOpenPrivacy }) {
         <div><span>ENCONTRE-NOS</span><a href={LOCATION} target="_blank" rel="noreferrer">Águas Claras — Brasília, DF</a><small>Veja a rota no Google Maps</small></div>
         <div className="footer-instagram"><span>SIGA A KAKÁ</span><a href={INSTAGRAM} target="_blank" rel="noreferrer"><span className="instagram-icon"><InstagramGlyph /></span>@kakalacerdaflores</a><small>Instagram oficial</small></div>
       </div>
-      <div className="footer-bottom"><span>© 2026 Kaká Lacerda. Todos os direitos reservados.</span><button type="button" onClick={onOpenPrivacy}>Preferências de privacidade</button><span><ShieldCheck size={14} /> Atendimento seguro pelo WhatsApp</span></div>
+      <div className="footer-bottom">
+        <span>© 2026 Kaká Lacerda. Todos os direitos reservados.</span>
+        <span className="footer-legal-links">
+          <button type="button" onClick={onOpenPolicy}>Política de privacidade</button>
+          <button type="button" onClick={onOpenCookiePreferences}>Preferências de cookies</button>
+        </span>
+        <span><ShieldCheck size={14} /> Atendimento seguro pelo WhatsApp</span>
+      </div>
     </footer>
   );
 }
 
-function ConsentBanner({ currentConsent, onChoose }) {
+function ConsentBanner({ currentConsent, onChoose, onOpenPolicy }) {
   if (currentConsent !== null) return null;
   return (
     <aside className="consent-banner" aria-label="Preferências de privacidade">
       <div>
         <strong>Sua privacidade importa</strong>
-        <p>Usamos tecnologias opcionais para medir acessos, produtos visualizados e cliques no WhatsApp. Você pode aceitar ou recusar sem afetar o funcionamento do catálogo.</p>
+        <p>Usamos tecnologias opcionais para medir acessos, produtos visualizados e cliques no WhatsApp. Você pode aceitar ou recusar sem afetar o funcionamento do catálogo. <button type="button" className="link-inline" onClick={onOpenPolicy}>Saiba mais</button>.</p>
       </div>
       <div className="consent-actions">
         <button type="button" className="consent-reject" onClick={() => onChoose('denied')}>Recusar</button>
@@ -543,8 +550,61 @@ function ConsentBanner({ currentConsent, onChoose }) {
   );
 }
 
+function PrivacyPolicyModal({ open, onClose }) {
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    previouslyFocusedRef.current = document.activeElement;
+    closeButtonRef.current?.focus();
+    const onKeyDown = (event) => event.key === 'Escape' && onClose();
+    document.body.classList.add('modal-open');
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.classList.remove('modal-open');
+      window.removeEventListener('keydown', onKeyDown);
+      previouslyFocusedRef.current?.focus?.();
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <div className="privacy-modal-backdrop" role="presentation" onMouseDown={onClose}>
+      <article className="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title" onMouseDown={(event) => event.stopPropagation()}>
+        <button className="modal-close" type="button" ref={closeButtonRef} onClick={onClose} aria-label="Fechar política de privacidade"><X size={20} /></button>
+        <div className="privacy-content">
+          <span className="product-category">Kaká Lacerda</span>
+          <h2 id="privacy-modal-title">Política de Privacidade</h2>
+          <p className="privacy-updated">Última atualização: 12 de setembro de 2026.</p>
+
+          <h3>Quem somos</h3>
+          <p>Este site é operado por Kaká Lacerda — Flores e Cestas, floricultura e casa de presentes em Águas Claras, Brasília (DF), responsável pelos dados tratados aqui.</p>
+
+          <h3>Quais dados coletamos e para quê</h3>
+          <p>Usamos o Google Analytics para entender como o catálogo é navegado (páginas e produtos visualizados, dispositivo, origem do acesso) e o Meta Pixel para medir o resultado de campanhas no Instagram e Facebook. Essas duas ferramentas só são carregadas depois que você aceita a medição no banner de cookies; se você recusar, nenhuma delas roda no seu navegador. Também registramos, de forma agregada, os cliques nos botões de WhatsApp para saber quais produtos geram mais interesse.</p>
+          <p>Se você decide finalizar um pedido pelo WhatsApp, seus dados de contato, endereço de entrega e forma de pagamento são combinados diretamente na conversa com a Kaká, fora deste site, e seguem as regras de privacidade do próprio WhatsApp.</p>
+
+          <h3>Com quem compartilhamos</h3>
+          <p>Os dados de navegação coletados com o seu consentimento são compartilhados apenas com o Google (Google Analytics) e a Meta (Meta Pixel), somente para as finalidades de mensuração descritas acima. Não vendemos nem repassamos seus dados a terceiros para outros fins.</p>
+
+          <h3>Cookies e armazenamento local</h3>
+          <p>Guardamos sua escolha (aceitar ou recusar a medição) no armazenamento local do seu navegador, para não perguntar de novo a cada visita. Você pode mudar de ideia a qualquer momento em "Preferências de cookies", no rodapé do site.</p>
+
+          <h3>Seus direitos, pela LGPD</h3>
+          <p>Você pode pedir a confirmação de quais dados temos sobre você, solicitar correção ou exclusão, revogar o consentimento para a medição, ou pedir mais detalhes sobre este tratamento. Para exercer qualquer um desses direitos, fale com a gente pelo WhatsApp <WhatsAppLink href={WHATSAPP} source="politica_de_privacidade" target="_blank" rel="noreferrer">(61) 98206-0828</WhatsAppLink>.</p>
+
+          <h3>Alterações desta política</h3>
+          <p>Este texto pode ser atualizado quando novas funcionalidades forem adicionadas ao site. A data no topo desta página sempre indica a versão mais recente.</p>
+        </div>
+      </article>
+    </div>
+  );
+}
+
 function App() {
   const [consent, setConsent] = useState(() => localStorage.getItem(ANALYTICS_CONSENT_KEY));
+  const [showPolicy, setShowPolicy] = useState(false);
 
   useEffect(() => {
     if (consent === 'granted') initializeAnalytics();
@@ -558,7 +618,7 @@ function App() {
     if (choice === 'denied' && previousConsent === 'granted') window.location.reload();
   };
 
-  return <><Header /><Hero /><Catalog /><Services /><Story /><Process /><ServiceInfo /><InstagramLife /><FAQ /><Footer onOpenPrivacy={() => setConsent(null)} /><WhatsAppLink className="floating-whatsapp" href={whatsapp('Olá, Kaká! Vi o catálogo no site e gostaria de fazer uma encomenda.')} source="botao_flutuante" target="_blank" rel="noreferrer" aria-label="Encomendar pelo WhatsApp"><WhatsAppIcon /><span>Encomende pelo WhatsApp</span></WhatsAppLink><ConsentBanner currentConsent={consent} onChoose={chooseConsent} /></>;
+  return <><Header /><Hero /><Catalog /><Services /><Story /><Process /><ServiceInfo /><InstagramLife /><FAQ /><Footer onOpenCookiePreferences={() => setConsent(null)} onOpenPolicy={() => setShowPolicy(true)} /><WhatsAppLink className="floating-whatsapp" href={whatsapp('Olá, Kaká! Vi o catálogo no site e gostaria de fazer uma encomenda.')} source="botao_flutuante" target="_blank" rel="noreferrer" aria-label="Encomendar pelo WhatsApp"><WhatsAppIcon /><span>Encomende pelo WhatsApp</span></WhatsAppLink><ConsentBanner currentConsent={consent} onChoose={chooseConsent} onOpenPolicy={() => setShowPolicy(true)} /><PrivacyPolicyModal open={showPolicy} onClose={() => setShowPolicy(false)} /></>;
 }
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
